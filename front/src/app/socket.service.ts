@@ -2,8 +2,6 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 import io from 'socket.io-client';
-import { Socket } from 'dgram';
-
 
 @Injectable()
 export class SocketService {
