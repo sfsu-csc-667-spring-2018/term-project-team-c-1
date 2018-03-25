@@ -6,7 +6,10 @@ module.exports = (sequelize, DataTypes) => {
     },
     status: {
       type: DataTypes.INTEGER
-    }
+    },
+    direction: {
+      type: DataTypes.BOOLEAN
+    },
   }, {});
   Game.associate = function(models) {
     Game.belongsTo(models.User);
