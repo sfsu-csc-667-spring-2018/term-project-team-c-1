@@ -9,7 +9,7 @@ export class ApiService {
 
   private jwt() {
     const authToken = localStorage.getItem('UnoToken');
-    if(authToken) {
+    if (authToken) {
       const header = new Headers({'JWT-AuthToken': authToken});
       return new RequestOptions({headers: header});
     }
@@ -24,20 +24,20 @@ export class ApiService {
     for (var key in data) {
       params.set(key,data[key]);
     }
-    let req:RequestOptions=this.jwt();
-    req['search']=params;
-    return this.http.get('/api/'+path,req).map((response:Response)=>response.json());
+    const req: RequestOptions = this.jwt();
+    req['search'] = params;
+    return this.http.get('/api/' + path, req).map((response: Response) => response.json());
   }
 
-  post(path,data){
-    return this.http.post('/api/'+path,data,this.jwt()).map((response:Response)=>response.json());
+  post(path, data) {
+    return this.http.post('/api/' + path, data, this.jwt()).map((response: Response) => response.json());
   }
 
-  put(path,data){
-    return this.http.put('/api/'+path,data,this.jwt()).map((response:Response)=>response.json());
+  put(path, data) {
+    return this.http.put('/api/' + path, data,  this.jwt()).map((response: Response) => response.json());
   }
 
-  delete(path,data){
-    return this.http.delete('/api/'+path+data,this.jwt()).map((response:Response)=>response.json());
+  delete(path, data) {
+    return this.http.delete('/api/' + path + data, this.jwt()).map((response: Response) => response.json());
   }
 }

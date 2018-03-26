@@ -9,12 +9,10 @@ import { AppRouting } from './app.routing';
 import { HomeModule } from './home/home.module';
 import { ApiService } from './api.service';
 import { SocketService } from './socket.service';
-import { LoginComponent } from './login/login.component';
 
 @NgModule({
   declarations: [
-    AppComponent,
-    LoginComponent
+    AppComponent
   ],
   imports: [
     BrowserModule,
