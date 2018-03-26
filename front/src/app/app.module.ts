@@ -5,10 +5,9 @@ import { HttpModule } from '@angular/http';
 import { LocationStrategy, HashLocationStrategy } from '@angular/common';
 
 import { AppComponent } from './app.component';
-import { AppRouting } from './app.routing';
-import { HomeModule } from './home/home.module';
 import { ApiService } from './api.service';
-import { SocketService } from './socket.service';
+import { HomeModule } from './home/home.module';
+import { AppRouting } from './app.routing';
 
 @NgModule({
   declarations: [
@@ -16,12 +15,12 @@ import { SocketService } from './socket.service';
   ],
   imports: [
     BrowserModule,
-    HomeModule,
     FormsModule,
     HttpModule,
     AppRouting,
+    HomeModule
   ],
-  providers: [{provide: LocationStrategy, useClass: HashLocationStrategy}, ApiService, SocketService],
+  providers: [{provide: LocationStrategy, useClass: HashLocationStrategy}, ApiService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
