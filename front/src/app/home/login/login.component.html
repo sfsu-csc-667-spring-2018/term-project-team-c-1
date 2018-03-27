@@ -7,7 +7,7 @@
       </nav>
       <div class="container" style="padding-top: 20px;">
         <div class="row align-center"><span style="font-weight: 300;font-size: 2.5rem;">Login</span></div>
-        <form (ngSubmit)="login()">
+        <form (ngSubmit)="login()" ngNativeValidate>
           <div class="form-group">
             <label for="username">Username</label>
             <input type="text" class="form-control" id="username" placeholder="Enter your username..." [ngModelOptions]="{standalone: true}" [(ngModel)]="user.username" required>

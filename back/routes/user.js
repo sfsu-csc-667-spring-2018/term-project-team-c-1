@@ -8,7 +8,10 @@ var models = require('../models');
 
 
 router.get('/details',function(req,res,next){
-    res.json(['Hello']);
+    user=req.authdata;
+	models.User.findById(user.id,{attributes:['username','name']}).then(function(data){
+		return res.json(data);
+	})
 })
 
 module.exports = router;

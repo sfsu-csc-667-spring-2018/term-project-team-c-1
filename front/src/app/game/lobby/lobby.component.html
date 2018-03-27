@@ -21,11 +21,36 @@
         <tr *ngFor="let lobby of lobbies;let i=index;">
           <th scope="row">{{i+1}}</th>
           <td>{{lobby.User.username}}</td>
-          <td></td>
-          <td *ngIf="lobby.UserId==userId"><button class="btn btn-info btn-xs">Go</button></td>
-          <td *ngIf="lobby.UserId!=userId"><button class="btn btn-success btn-xs">Join</button></td>
+          <td>{{lobby.GameUsers.length}}/4</td>
+          <td *ngIf="lobby.UserId==userId || check(lobby.GameUsers)==true"><button class="btn btn-info btn-xs">Go</button></td>
+          <td *ngIf="lobby.UserId!=userId && check(lobby.GameUsers)==false"><button class="btn btn-success btn-xs">Join</button></td>
         </tr>
       </tbody>
     </table>
+  </div>
+</div>
+<div class="chat">
+  <nav class="navbar navbar-inverse bg-dark chat_header">
+      <span class="nav-brand">
+        Chat Room
+      </span>
+  </nav>
+  <div class="container-fluid chat_box">
+      <div ngx-auto-scroll lock-y-offset="10" observe-attributes class="chat-messages">
+        <div class="message-wrapper" *ngFor="let msg of chatMessages;let i=index" [ngClass]="{'right':msg.UserId==userId,'left':msg.UserId!=userId}" role="alert"
+>
+            <div class="alert" [ngClass]="{'alert-info': msg.UserId == userId, 'alert-warning': msg.UserId != userId}">
+              {{msg.User.username}} : {{msg.message}}
+            </div>
+        </div>
+      </div>
+      <div class="container-fluid chat_message">
+        <form (ngSubmit)="sendMessage()" ngNativeValidate>
+          <div class="input-group">
+            <input type="text" class="form-control" style="outline:none;" placeholder="Message..." [ngModelOptions]="{standalone: true}"  [(ngModel)]="chatMessage" required>
+            <button type="submit" class="btn btn-success input-group-addon">Send</button>
+          </div>
+        </form>
+      </div>
   </div>
 </div>

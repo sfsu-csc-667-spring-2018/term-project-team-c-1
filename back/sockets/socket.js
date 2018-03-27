@@ -19,6 +19,15 @@ io.on("connection",socket=>{
         }
     });
 
+    socket.on('lobby:msg',data=>{
+        models.Lobby.create({
+            message:data,
+            UserId:socket._userId
+        }).then(lobby=>{
+           emitChat(socket,lobby.id);
+        });
+    })
+
     socket.on('create',data=>{
         models.Game.find({
             where:{status:{$ne:0}},
@@ -34,20 +43,37 @@ io.on("connection",socket=>{
                     direction:true,
                     UserId:socket._userId
                 }).then(game=>{
-                    socket.emit('create:response',{"Message":"Your lobby is ready"});
-                    emitStatus(socket);
+                    models.GameUser.create({
+                        GameId:game.id,
+                        UserId:socket._userId,
+                        status:0
+                    }).then(gameuser=>{
+                        socket.emit('create:response',{"Message":"Your lobby is ready"});
+                        emitStatus(socket);
+                    });
                 })
             }
         })
     })
 });
 
+function emitChat(socket, msgId) {
+    if(socket._gameId=="lobby"){
+        models.Lobby.find({
+            where:{id:msgId},
+            include:[{model: models.User}]
+        }).then(lob=>{
+            io.to(socket._gameId).emit("lobby:response",lob);
+        });
+    }
+}
+
 function emitStatus(socket){
     if(socket._gameId=="lobby"){
         models.Game.findAll({
             where: {status: { $ne: 0 }},
             order: [["createdAt","DESC"]],
-            include: [{ model: models.User}]
+            include: [{ model: models.User},{model:models.GameUser}]
         }).then(result=>{
             io.to(socket._gameId).emit("status",result);
         });
