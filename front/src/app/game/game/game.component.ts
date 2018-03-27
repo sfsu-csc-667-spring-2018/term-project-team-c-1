@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { User } from './user';
+import { ApiService } from '../../api.service';
 
 @Component({
   selector: 'app-game',
@@ -6,10 +8,17 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./game.component.css']
 })
 export class GameComponent implements OnInit {
-
-  constructor() { }
+  user: User;
+  constructor(private api: ApiService) {
+    this.user = new User;
+  }
 
   ngOnInit() {
+    this.api.getAll('user/details')
+    .subscribe(data => {
+      //this.user = data;
+      console.log(data);
+    });
   }
 
 }

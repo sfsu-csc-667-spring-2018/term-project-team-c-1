@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
-import io from 'socket.io-client';
+// import io from 'socket.io-client';
+import * as io from 'socket.io-client';
 
 @Injectable()
 export class SocketService {
@@ -9,12 +10,12 @@ export class SocketService {
   private url: string;
   private observables: any;
   constructor() {
-    this.url = "http://localhost:3000";
-    this.observables = {}
+    this.url = 'http://localhost:3000';
+    this.observables = {};
   }
 
-  connect(tableId: string) {
-    this.socket = io.connect(this.url, { query: "tableId=" + tableId+'&userToken='+localStorage.getItem('PokrToken') });
+  connect(game: string) {
+    this.socket = io(this.url,{ query: 'game=' + game + '&userToken=' + localStorage.getItem('UnoToken') });
   }
 
   send(method: string, data: any) {
@@ -35,11 +36,11 @@ export class SocketService {
     return this.observables[method];
   }
 
-  on(method: string, cb:(data: any)=> void) {
+  on(method: string, cb:(data: any) => void) {
     return this.socket.on(method, cb);
   }
 
-  once(method: string, cb:(data: any)=> void) {
+  once(method: string, cb:(data: any) => void) {
     return this.socket.once(method, cb);
   }
 
