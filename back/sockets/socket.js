@@ -16,6 +16,7 @@ io.on("connection",socket=>{
           socket.join(game);
           socket.emit("auth", { userId: decoded.id });
           emitStatus(socket);
+          emitLobby();
         }
     });
 
@@ -27,6 +28,42 @@ io.on("connection",socket=>{
            emitChat(socket,lobby.id);
         });
     })
+
+    socket.on('table:msg',data=>{
+        models.Chat.create({
+            message:data,
+            GameUserId:socket._gameUserId
+        }).then(lobby=>{
+           emitChat(socket,lobby.id);
+        });
+    })
+    
+    socket.on('table:start',data=>{
+
+    });
+
+
+
+    socket.on('table:cancel',data=>{
+        models.Game.findById(socket._gameId).then(game=>{
+            game.update({
+                status:0
+            }).then(dat=>{
+                io.to(socket._gameId).emit('closed','');
+                emitLobby();
+            })
+        })
+    });
+
+    socket.on('table:remove',data=>{
+        models.GameUser.destroy({
+            where:{GameId:socket._gameId,UserId:data}
+        }).then(dat=>{
+            io.to(socket._gameId).emit('removeUser',{user:data});
+            emitStatus(socket);
+            emitLobby();
+        })
+    });
 
     socket.on('create',data=>{
         models.Game.find({
@@ -66,6 +103,24 @@ function emitChat(socket, msgId) {
             io.to(socket._gameId).emit("lobby:response",lob);
         });
     }
+    else{
+        models.Chat.find({
+            where:{id:msgId},
+            include:[{model: models.GameUser,include:[{model:models.User}]}]
+        }).then(lob=>{
+            io.to(socket._gameId).emit("table:response",lob);
+        });
+    }
+}
+
+function emitLobby(){
+    models.Game.findAll({
+        where: {status: 1},
+        order: [["createdAt","DESC"]],
+        include: [{ model: models.User},{model:models.GameUser}]
+    }).then(result=>{
+        io.to('lobby').emit("status",result);
+    });
 }
 
 function emitStatus(socket){
@@ -79,7 +134,20 @@ function emitStatus(socket){
         });
     }
     else{
-        console.log(socket._gameId);
+        models.GameUser.find({
+            where:{
+                UserId:socket._userId,
+                GameId:socket._gameId
+            }
+        }).then(dat=>{
+            socket._gameUserId=dat.id
+        })
+        models.Game.find({
+            where:{id:socket._gameId},
+            include: [{ model: models.User},{model:models.GameUser,include:[{model:models.User}]}]
+        }).then(game=>{
+            io.to(socket._gameId).emit("status",game);
+        })
     }
 }
 

@@ -4,7 +4,7 @@ var router = express.Router();
 
 var models = require('../models');
 
-router.get('/go',function(req,res,next){
+router.get('/join',function(req,res,next){
     models.Game.find(
         {where:{id : req.query.game},include: [{model:models.GameUser}]}).then(game=>{
         if(game.status==1){
@@ -32,7 +32,7 @@ router.get('/go',function(req,res,next){
     })
 });
 
-router.get('/join',function(req,res,next){
+router.get('/go',function(req,res,next){
     models.Game.findById(req.query.game).then(game=>{
         if(game.UserId==req.authdata.id && game.status==1){
             return res.json(['Success']);

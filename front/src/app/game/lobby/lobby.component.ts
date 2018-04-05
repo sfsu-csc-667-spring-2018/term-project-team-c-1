@@ -52,6 +52,7 @@ export class LobbyComponent implements OnInit {
 
   join(gameId) {
     this.api.get('game/join', {game : gameId}).subscribe(data => {
+      console.log(data);
       if (data[0] === 'Success') {
         this.router.navigate(['game/table', gameId]);
       }

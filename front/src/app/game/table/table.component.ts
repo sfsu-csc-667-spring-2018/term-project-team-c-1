@@ -28,6 +28,42 @@ export class TableComponent implements OnInit {
     this.socket.receive('auth').subscribe((data) => {
       this.userId = data['userId'];
     });
+
+    this.socket.receive('status').subscribe((data) => {
+      this.game = data;
+      console.log(this.game);
+    });
+
+    this.socket.receive('closed').subscribe((data) => {
+      this.router.navigate(['./game']);
+    });
+
+    this.socket.receive('removeUser').subscribe((data) => {
+      if(data.user == this.userId) {
+        this.router.navigate(['./game']);
+      }
+    });
+
+    this.socket.receive('table:response').subscribe((data) => {
+      this.chatMessages.push(data);
+    });
+  }
+
+  cancel() {
+    this.socket.send('table:cancel', {});
+  }
+
+  start() {
+    this.socket.send('table:start', {});
+  }
+
+  remove(user) {
+    this.socket.send('table:remove', user);
+  }
+
+  sendMessage() {
+    this.socket.send('table:msg', this.chatMessage);
+    this.chatMessage = '';
   }
 
 }

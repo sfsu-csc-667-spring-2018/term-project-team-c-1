@@ -1,3 +1,54 @@
-<p>
-  table works!
-</p>
+<div class="full-screen" style="display: flex;flex-flow: column;" *ngIf="game">
+    <nav class="navbar" *ngIf="game.status==1">
+      <span class="navbar-brand">
+        Host : {{game.User.username}}
+      </span>
+      <span class="navbar-text float-xs-right" style="margin-right:5px;" *ngIf="game.UserId==userId">
+        <button class="btn btn-danger" (click)="cancel()">Cancel</button>
+        <button class="btn btn-info" [disabled]="game.GameUsers.length==4" (click)="start()">Start</button>
+      </span>
+    </nav>
+    <div class="container-fluid">
+      <table class="table">
+        <thead class="thead-dark">
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Player</th>
+            <th scope="col">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of game.GameUsers;let i=index;">
+            <th scope="row">{{i+1}}</th>
+            <td>{{user.User.username}}</td>
+            <td *ngIf="user.User.id!=game.UserId && game.UserId==userId"><button (click)="remove(user.User.id)" class="btn btn-danger btn-xs">Remove</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+<div class="chat">
+    <nav class="navbar navbar-inverse bg-dark chat_header">
+        <span class="nav-brand">
+          Chat Room
+        </span>
+    </nav>
+    <div class="container-fluid chat_box">
+        <div ngx-auto-scroll lock-y-offset="10" observe-attributes class="chat-messages">
+          <div class="message-wrapper" *ngFor="let msg of chatMessages;let i=index" [ngClass]="{'right':msg.GameUser.UserId==userId,'left':msg.GameUser.UserId!=userId}" role="alert"
+  >
+              <div class="alert" [ngClass]="{'alert-info': msg.GameUser.UserId == userId, 'alert-warning': msg.GameUser.UserId != userId}">
+                {{msg.GameUser.User.username}} : {{msg.message}}
+              </div>
+          </div>
+        </div>
+        <div class="container-fluid chat_message">
+          <form (ngSubmit)="sendMessage()" ngNativeValidate>
+            <div class="input-group">
+              <input type="text" class="form-control" style="outline:none;" placeholder="Message..." [ngModelOptions]="{standalone: true}"  [(ngModel)]="chatMessage" required>
+              <button type="submit" class="btn btn-success input-group-addon">Send</button>
+            </div>
+          </form>
+        </div>
+    </div>
+  </div>
