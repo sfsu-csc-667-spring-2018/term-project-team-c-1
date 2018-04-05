@@ -20,7 +20,7 @@ const routes: Routes = [
             { path: 'register', component: RegisterComponent },
             { path: 'reset', component: ResetComponent },
             { path: 'verify', component: VerifyComponent },
-            { path: '**', redirectTo: '', pathMatch: 'full' }
+            // { path: '**', redirectTo: '', pathMatch: 'full' }
         ]
     }
 ];

@@ -15,7 +15,7 @@ io.on("connection",socket=>{
           socket._gameId = game;
           socket.join(game);
           socket.emit("auth", { userId: decoded.id });
-          emitStatus(socket);   
+          emitStatus(socket);
         }
     });
 
@@ -71,12 +71,15 @@ function emitChat(socket, msgId) {
 function emitStatus(socket){
     if(socket._gameId=="lobby"){
         models.Game.findAll({
-            where: {status: { $ne: 0 }},
+            where: {status: 1},
             order: [["createdAt","DESC"]],
             include: [{ model: models.User},{model:models.GameUser}]
         }).then(result=>{
             io.to(socket._gameId).emit("status",result);
         });
+    }
+    else{
+        console.log(socket._gameId);
     }
 }
 

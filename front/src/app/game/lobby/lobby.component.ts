@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { SocketService } from '../../socket.service';
+import { ApiService } from '../../api.service';
 
 @Component({
   selector: 'app-lobby',
@@ -11,7 +13,7 @@ export class LobbyComponent implements OnInit {
   lobbies: Array<any>;
   chatMessage: string;
   chatMessages: Array<any>;
-  constructor(private socket: SocketService) {
+  constructor(private socket: SocketService, private api: ApiService, private router: Router) {
     this.userId = '';
     this.lobbies = [];
     this.chatMessage = '';
@@ -46,6 +48,22 @@ export class LobbyComponent implements OnInit {
       }
     }
     return false;
+  }
+
+  join(gameId) {
+    this.api.get('game/join', {game : gameId}).subscribe(data => {
+      if (data[0] === 'Success') {
+        this.router.navigate(['game/table', gameId]);
+      }
+    });
+  }
+
+  go(gameId) {
+    this.api.get('game/go', {game : gameId}).subscribe(data => {
+      if (data[0] === 'Success') {
+        this.router.navigate(['game/table', gameId]);
+      }
+    });
   }
 
   create() {

@@ -4,6 +4,7 @@ const router = express.Router();
 const config = require('../config');
 const home = require('./home');
 const user = require('./user');
+const game = require('./game');
 
 router.get('/',(req,res,next)=>{
 	res.json(["Hello","World"]);
@@ -35,5 +36,6 @@ var auth=(req,res,next)=>{
 
 router.use('/home',home);
 router.use('/user',auth,user);
+router.use('/game',auth,game);
 
 module.exports = router;

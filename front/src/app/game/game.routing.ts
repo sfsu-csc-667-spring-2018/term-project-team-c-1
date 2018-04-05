@@ -11,7 +11,7 @@ const routes: Routes = [
         children: [
             { path: '', component: LobbyComponent },
             { path: 'table/:id', component: TableComponent },
-            { path: '**', redirectTo: '', pathMatch: 'full' }
+            // { path: '**', redirectTo: '', pathMatch: 'full' }
         ]
     }
 ];
