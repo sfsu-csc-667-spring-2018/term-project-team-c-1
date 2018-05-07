@@ -3,7 +3,7 @@
     flex-flow: column;
     width: 280px;
     height: 300px;
-    position: absolute;
+    position: fixed;
     bottom: 0px;
     right: 5px;
 }
@@ -86,13 +86,26 @@ div.chat-messages > div.message-wrapper.center{
     bottom: 0;
 }
 .card{
-    width:87px;
-    height:135px;
+    width:60px;
+    height:92px;
     background:url('assets/uno.png');
+    background-size: 1014%;
+
 }
 .player{
     position: absolute;
     top: 400px;
     width: 400px;
     height: 100px;
+}
+.player1{
+    top:0px;
+    left:-400px;
+}
+.player2{
+    top:-300px;
+}
+.player3{
+    top:0px;
+    left:400px;
 }

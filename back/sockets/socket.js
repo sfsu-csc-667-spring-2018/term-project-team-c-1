@@ -49,6 +49,92 @@ io.on("connection",socket=>{
            emitChat(socket,lobby.id);
         });
     })
+
+    socket.on('table:play',data=>{
+        models.Card.findById(data.CardId).then(card=>{
+            models.GameCard.create({
+                status:0,
+                CardId:data.CardId,
+                GameId:socket._gameId
+            }).then(gamecard=>{
+                models.GameUser.findOne({
+                    where:{GameId:socket._gameId,isCurrent:true}
+                }).then(gameuser=>{
+                    models.UserCard.update({status:1},{where:{id:data.id}}).then(usercard=>{
+                        if(card.type>=5){
+                            models.UserPlay.create({
+                                color:data.color,
+                                GameId:socket._gameId,
+                                CardId:card.id,
+                                GameUserId:gameuser.id
+                            }).then(play=>{
+                                if(card.type==2){
+                                    nextplay(socket,'skip');
+                                }
+                                else if(card.type==3){
+                                    nextplay(socket,'reverse');
+                                }
+                                else{
+                                    nextplay(socket,'normal');
+                                }
+                            })
+                        }
+                        else{
+                            models.UserPlay.create({
+                                color:card.color,
+                                GameId:socket._gameId,
+                                CardId:card.id,
+                                GameUserId:gameuser.id
+                            }).then(play=>{
+                                if(card.type==2){
+                                    nextplay(socket,'skip');
+                                }
+                                else if(card.type==3){
+                                    nextplay(socket,'reverse');
+                                }
+                                else{
+                                    nextplay(socket,'normal');
+                                }
+                            })
+                        }
+                    });
+                })
+            });
+        })
+    });
+
+    socket.on('table:draw',data=>{
+        models.GameUser.findOne({
+            where:{GameId:socket._gameId,isCurrent:true}
+        }).then(gameuser=>{
+            models.GameDeck.findAll({
+                where:{GameId:socket._gameId,status:0},
+                order:[['id']],
+                limit:data['num']
+            }).then(gamedeck=>{
+                plist=[];
+                for(var i=0;i<gamedeck.length;i++){
+                    p1=models.UserCard.create({
+                        status:0,
+                        CardId:gamedeck[i].CardId,
+                        GameUserId:gameuser.id
+                    });
+                    plist.push(p1);
+                    gamedeck[i].update({status:1});
+                }
+                Promise.all(plist).then(dat=>{
+                    nextplay(socket,'normal');
+                })
+            })
+        })
+    //    models.GameCard.find({
+    //        where:{GameId:socket._gameId,status:0},
+    //        order:[['id','DESC']],
+    //        limit:1
+    //    }).then(gamecards=>{
+    //        console.log(gamecards);
+    //    })
+    });
     
     socket.on('table:start',data=>{
         models.GameUser.findAll({
@@ -169,10 +255,72 @@ io.on("connection",socket=>{
     })
 });
 
+function nextplay(socket,play){
+    models.GameUser.findAll({
+        where:{GameId:socket._gameId}
+    }).then(gameusers=>{
+        currentPos=0
+        for(var i=0;i<gameusers.length;i++){
+            if(gameusers[i].isCurrent){
+                currentPos=gameusers[i].position;
+            }
+        }
+        models.Game.findById(socket._gameId).then(game=>{
+            if(game.direction){
+                if(play=='normal'){
+                    newPos=currentPos+1;
+                }
+                else if(play=='skip'){
+                    newPos=currentPos+2;
+                }
+                else if(play=='reverse'){
+                    newPos=currentPos-1;
+                }
+            }
+            else{
+                if(play=='normal'){
+                    newPos=currentPos-1;
+                }
+                else if(play=='skip'){
+                    newPos=currentPos-2;
+                }
+                else if(play=='reverse'){
+                    newPos=currentPos+1;
+                }
+            }
+            if(newPos>gameusers.length){
+                newPos=newPos-gameusers.length;
+            }
+            else if(newPos<1){
+                newPos=newPos+gameusers.length;
+            }
+            models.GameUser.update({isCurrent:false},{where:{GameId:socket._gameId,position:currentPos}}).then(ogameuser=>{
+                models.GameUser.update({isCurrent:true},{where:{GameId:socket._gameId,position:newPos}}).then(ngameuser=>{
+                    if(play=='reverse'){
+                        if(game.direction){
+                            game.update({direction:false}).then(ngame=>{
+                                emitstate(socket._gameId);
+                            })
+                        }
+                        else{
+                            game.update({direction:true}).then(ngame=>{
+                                emitstate(socket._gameId);
+                            })
+                        }
+                    }
+                    else{
+                        emitstate(socket._gameId);
+                    }
+                })
+            })
+        });
+    })
+}
+
 function emitstate(gameId) {
     models.Game.findOne({
         where:{id:gameId},
-        include:[{model:models.GameUser,order:[['position']],include:[{model:models.User},{model:models.UserCard,where:{status:0},include:[{model:models.Card}]}]},{model:models.GameCard,include:[{model:models.Card}],order: [["id","DESC"]]}]
+        include:[{model:models.UserPlay,order:[['id','DESC']],limit:1,include:[{model:models.GameUser}]},{model:models.GameUser,order:[['position']],include:[{model:models.User},{model:models.UserCard,where:{status:0},include:[{model:models.Card}]}]},{model:models.GameCard,include:[{model:models.Card}],limit:1,order: [["id","DESC"]]}]
     }).then(game=>{
         io.to(gameId).emit("table:status",game);
     });

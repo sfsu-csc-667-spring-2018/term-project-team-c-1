@@ -14,12 +14,16 @@ export class TableComponent implements OnInit {
   game: any;
   chatMessage: string;
   chatMessages: Array<any>;
+  playCard:any;
+  showColor:boolean;
   constructor(private socket: SocketService, private router: Router, private activatedRoute: ActivatedRoute) {
     this.userId = '';
     this.gamestate = {};
     this.game = {};
     this.chatMessage = '';
     this.chatMessages = [];
+    this.playCard = {};
+    this.showColor=false;
     this.activatedRoute.params.subscribe((params: Params) => {
       this.tableId = params['id'];
     });
@@ -42,7 +46,7 @@ export class TableComponent implements OnInit {
           flag=true;
           counter=i;
         }
-        if(counter>=i && flag==true){
+        if(counter<=i && flag==true){
           arr.push(this.gamestate.GameUsers[i]);
         }
       }
@@ -50,7 +54,6 @@ export class TableComponent implements OnInit {
         arr.push(this.gamestate.GameUsers[i]);
       }
       this.gamestate.Users=arr;
-      console.log(this.gamestate);
     });
 
     this.socket.receive('status').subscribe((data) => {
@@ -70,6 +73,97 @@ export class TableComponent implements OnInit {
     this.socket.receive('table:response').subscribe((data) => {
       this.chatMessages.push(data);
     });
+  }
+
+  checkPlayable(card1, card2) {
+    if(card1.Card.name[1]==card2.Card.name[1]){
+      return true;
+    }
+    if(card1.Card.color == card2.Card.color){
+      return true;
+    }
+    if(card1.Card.type==card2.Card.type && card1.Card.type>1){
+      return true;
+    }
+    if(card2.Card.type>=5){
+      let oldPos=this.gamestate.UserPlays[0].GameUser.position;
+      let cPos=this.gamestate.Users[0].position;
+      let flag=false;
+      if(this.gamestate.direction){
+        if(oldPos==cPos-1){
+          flag=true;
+        }
+        if(cPos==1 && oldPos==this.gamestate.GameUsers.length){
+          flag=true;
+        }
+      }
+      if(card1.Card.color==this.gamestate.UserPlays[0].color && flag==false){
+        return true;
+      }
+    }
+    if(card1.Card.type==5 && card2.Card.type<=5){
+      return true;
+    }
+    if(card1.Card.type==6){
+      return true;
+    }
+    return false;
+  }
+
+  getDrawCount(card){
+    let oldPos=this.gamestate.UserPlays[0].GameUser.position;
+    let cPos=this.gamestate.Users[0].position;
+    let flag=false;
+    if(this.gamestate.direction){
+      if(oldPos==cPos-1){
+        flag=true;
+      }
+      if(cPos==1 && oldPos==this.gamestate.GameUsers.length){
+        flag=true;
+      }
+    }
+    else{
+      if(oldPos==cPos+1){
+        flag=true;
+      }
+      if(oldPos==1 && cPos==this.gamestate.GameUsers.length){
+        flag=true;
+      }
+    }
+    if(card.Card.type==6 && flag==true) {
+      return 4;
+    }
+    if(card.Card.type==4 && flag==true) {
+      return 2;
+    }
+    return 1;
+  }
+
+  play(card) {
+    if(this.gamestate.Users[0].isCurrent) {
+      if(this.checkPlayable(card, this.gamestate.GameCards[0])){
+        if(card.Card.type>=5){
+          this.playCard=card;
+          this.showColor=true;
+        }
+        else{
+          this.socket.send('table:play', card);
+        }
+      }
+    }
+  }
+
+  addColor(color){
+    this.showColor=false;
+    this.playCard.color=color;
+    this.socket.send('table:play',this.playCard);
+    this.playCard={};
+  }
+
+  draw() {
+    if(this.gamestate.Users[0].isCurrent) {
+      this.socket.send('table:draw',{'num':this.getDrawCount(this.gamestate.GameCards[0])});
+    }
   }
 
   cancel() {

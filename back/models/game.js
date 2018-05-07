@@ -13,6 +13,7 @@ module.exports = (sequelize, DataTypes) => {
   }, {});
   Game.associate = function(models) {
     Game.belongsTo(models.User);
+    Game.hasMany(models.UserPlay);
     Game.hasMany(models.GameUser);
     Game.hasMany(models.GameCard);
   };
