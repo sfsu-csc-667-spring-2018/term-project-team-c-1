@@ -10,11 +10,13 @@ import { SocketService } from '../../socket.service';
 export class TableComponent implements OnInit {
   tableId: string;
   userId: string;
+  gamestate: any;
   game: any;
   chatMessage: string;
   chatMessages: Array<any>;
   constructor(private socket: SocketService, private router: Router, private activatedRoute: ActivatedRoute) {
     this.userId = '';
+    this.gamestate = {};
     this.game = {};
     this.chatMessage = '';
     this.chatMessages = [];
@@ -25,13 +27,34 @@ export class TableComponent implements OnInit {
 
   ngOnInit() {
     this.socket.connect(this.tableId);
+
     this.socket.receive('auth').subscribe((data) => {
       this.userId = data['userId'];
     });
 
+    this.socket.receive('table:status').subscribe((data) => {
+      this.gamestate = data;
+      let counter=0;
+      let arr=[];
+      let flag=false;
+      for(var i=0;i<this.gamestate.GameUsers.length;i++){
+        if(this.gamestate.GameUsers[i].UserId==this.userId){
+          flag=true;
+          counter=i;
+        }
+        if(counter>=i && flag==true){
+          arr.push(this.gamestate.GameUsers[i]);
+        }
+      }
+      for(var i=0;i<counter;i++){
+        arr.push(this.gamestate.GameUsers[i]);
+      }
+      this.gamestate.Users=arr;
+      console.log(this.gamestate);
+    });
+
     this.socket.receive('status').subscribe((data) => {
       this.game = data;
-      console.log(this.game);
     });
 
     this.socket.receive('closed').subscribe((data) => {
@@ -65,5 +88,4 @@ export class TableComponent implements OnInit {
     this.socket.send('table:msg', this.chatMessage);
     this.chatMessage = '';
   }
-
 }

@@ -52,31 +52,47 @@ div.chat-messages{
     overflow-y: scroll;
     background: #ffffff;
 }
-
 div.chat-messages > div.message-wrapper{
     padding: 0px;
     margin: 0px;
     max-width: 100%;
 }
-
-
 div.chat-messages > div.message-wrapper > div.alert{
     padding: 5px;
     margin: 5px;
     max-width: 80%;
     display: inline-block;
 }
-
-
 div.chat-messages > div.message-wrapper.left{
     text-align: left;
 }
-
 div.chat-messages > div.message-wrapper.right{
     text-align: right;
 }
-
 div.chat-messages > div.message-wrapper.center{
     text-align: center !important;
     font-style: italic;
+}
+.board{
+    border:5px solid #5a5a5a;
+    background:#bababa;
+    width: 400px;
+    height: 400px;
+    position: absolute;
+    margin: auto;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+}
+.card{
+    width:87px;
+    height:135px;
+    background:url('assets/uno.png');
+}
+.player{
+    position: absolute;
+    top: 400px;
+    width: 400px;
+    height: 100px;
 }

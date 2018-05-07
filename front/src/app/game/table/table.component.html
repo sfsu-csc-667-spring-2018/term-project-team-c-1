@@ -8,7 +8,7 @@
         <button class="btn btn-info" [disabled]="game.GameUsers.length==4" (click)="start()">Start</button>
       </span>
     </nav>
-    <div class="container-fluid">
+    <div class="container-fluid" *ngIf="game.status==1">
       <table class="table">
         <thead class="thead-dark">
           <tr>
@@ -26,7 +26,23 @@
         </tbody>
       </table>
     </div>
-  </div>
+    <div class="container-fluid" *ngIf="game.status==2">
+      <div class="board">
+        <div class="card" style="position: absolute;margin:auto;left: 0;right: 0;top: 0;bottom: 0;" [ngStyle]="{'background-position-x.px':gamestate.GameCards[0].Card.xCoord,'background-position-y.px':gamestate.GameCards[0].Card.yCoord}"></div>
+        <div class="player playerself">
+          <div class="container-fluid" style="text-align:center;">
+            {{gamestate.Users[0].User.username}}
+          </div>
+          <div class="container-fluid">
+              <div style="float:left;" *ngFor="let card of gamestate.Users[0].UserCards" class="card" [ngStyle]="{'background-position-x.px':card.Card.xCoord,'background-position-y.px':card.Card.yCoord}"></div>
+          </div>
+        </div>
+        <div class="player player1"></div>
+        <div class="player player2"></div>
+        <div class="player player3"></div>
+      </div>
+    </div>
+</div>
 <div class="chat">
     <nav class="navbar navbar-inverse bg-dark chat_header">
         <span class="nav-brand">

@@ -6,6 +6,38 @@ var router = express.Router();
 
 var models = require('../models');
 
+router.get('/addcards',function(req,res,next){
+	models.Card.create({
+		name:'WC',
+		xCoord:480,
+		yCoord:160,
+		type:5,
+		color:0
+	});
+	models.Card.create({
+		name:'WC',
+		xCoord:420,
+		yCoord:160,
+		type:5,
+		color:0
+	});
+	models.Card.create({
+		name:'WF',
+		xCoord:360,
+		yCoord:160,
+		type:6,
+		color:0
+	});
+	models.Card.create({
+		name:'WF',
+		xCoord:300,
+		yCoord:160,
+		type:6,
+		color:0
+	});
+	res.json(['Hello']);
+});
+
 
 router.post('/login',function(req,res,next){
 	var user=req.body;

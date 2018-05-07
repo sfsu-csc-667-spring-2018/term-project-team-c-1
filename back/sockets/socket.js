@@ -5,6 +5,18 @@ const config = require("../config");
 
 // io.set('origins','http://localhost:4200.*');
 
+function shuffle(array) {
+    var currentIndex = array.length, temporaryValue, randomIndex;    
+    while (0 !== currentIndex) {
+      randomIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex -= 1;
+      temporaryValue = array[currentIndex];
+      array[currentIndex] = array[randomIndex];
+      array[randomIndex] = temporaryValue;
+    }
+    return array;
+  }
+
 io.on("connection",socket=>{
     let token = socket.handshake.query.userToken;
     let game = socket.handshake.query.game;
@@ -39,10 +51,73 @@ io.on("connection",socket=>{
     })
     
     socket.on('table:start',data=>{
+        models.GameUser.findAll({
+            where:{GameId:socket._gameId}
+        }).then(gameusers=>{
+            arr=shuffle(gameusers);
+            models.Card.findAll({}).then(cards=>{
+                var i=1;
+                promiselist=[];
+                arr.forEach(element => {
+                    if(i==1){
+                        p=element.update({
+                            position:i,
+                            isCurrent:true
+                        });
+                    }
+                    else{
+                        p=element.update({
+                            position:i
+                        });
+                    }
+                    promiselist.push(p);
+                    i++;
+                });
 
+                cardlist=shuffle(cards.concat(cards));
+                cardlist.forEach(element => {
+                    p=models.GameDeck.create({
+                        status:0,
+                        CardId:element.id,
+                        GameId:socket._gameId
+                    })
+                    promiselist.push(p);
+                });
+                Promise.all(promiselist).then(data=>{
+                   plist=[];
+                   counter=0;
+                   for(var i=0;i<arr.length;i++){
+                       for(var j=0;j<7;j++){
+                           p1=models.UserCard.create({
+                               status:0,
+                               CardId:cardlist[counter].id,
+                               GameUserId:arr[i].id
+                           })
+                           plist.push(p1);
+                           models.GameDeck.findOne({where:{CardId:cardlist[counter].id,GameId:socket._gameId,status:0},order:['id']}).then(gamedeck=>{
+                               gamedeck.update({status:1});
+                           })
+                           counter++;
+                       }
+                   }
+                   Promise.all(plist).then(dat=>{
+                        models.GameCard.create({
+                            status:0,
+                            CardId:cardlist[counter].id,
+                            GameId:socket._gameId
+                        }).then(gamecard=>{
+                            models.GameDeck.update({status:1},{where:{CardId:cardlist[counter].id,GameId:socket._gameId,status:0}}).then(d=>{
+                                models.Game.update({status:2},{where:{id:socket._gameId}}).then(game=>{
+                                    emitStatus(socket);
+                                    emitstate(socket._gameId);
+                                });
+                            });
+                        });
+                   });
+                });
+            });
+        });
     });
-
-
 
     socket.on('table:cancel',data=>{
         models.Game.findById(socket._gameId).then(game=>{
@@ -93,6 +168,15 @@ io.on("connection",socket=>{
         })
     })
 });
+
+function emitstate(gameId) {
+    models.Game.findOne({
+        where:{id:gameId},
+        include:[{model:models.GameUser,order:[['position']],include:[{model:models.User},{model:models.UserCard,where:{status:0},include:[{model:models.Card}]}]},{model:models.GameCard,include:[{model:models.Card}],order: [["id","DESC"]]}]
+    }).then(game=>{
+        io.to(gameId).emit("table:status",game);
+    });
+}
 
 function emitChat(socket, msgId) {
     if(socket._gameId=="lobby"){
@@ -147,7 +231,10 @@ function emitStatus(socket){
             include: [{ model: models.User},{model:models.GameUser,include:[{model:models.User}]}]
         }).then(game=>{
             io.to(socket._gameId).emit("status",game);
-        })
+            if(game.status!=1){
+                emitstate(game.id);
+            }
+        });
     }
 }
 

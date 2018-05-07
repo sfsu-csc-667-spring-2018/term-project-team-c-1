@@ -38,7 +38,16 @@ router.get('/go',function(req,res,next){
             return res.json(['Success']);
         }
         else{
-            return res.json(['Error']);
+            models.GameUser.find({
+                where:{UserId:req.authdata.id}
+            }).then(gameusers=>{
+                if(gameusers){
+                    return res.json(['Success']);
+                }
+                else{
+                    return res.json(['Error']);
+                }
+            });
         }
     })
 });

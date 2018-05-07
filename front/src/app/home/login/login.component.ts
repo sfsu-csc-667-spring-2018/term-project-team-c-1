@@ -27,7 +27,7 @@ export class LoginComponent implements OnInit {
         localStorage.setItem('UnoToken', data[1]);
         this.router.navigate(['/game']);
       } else if (data[0] === 'Verify') {
-        localStorage.setItem('PokrToken', data[1]);
+        localStorage.setItem('UnoToken', data[1]);
         this.router.navigate(['/verify']);
       } else {
         this.errorMsg = data[1];
