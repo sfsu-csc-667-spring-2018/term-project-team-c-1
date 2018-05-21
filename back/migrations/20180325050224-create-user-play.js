@@ -8,17 +8,27 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
+      color:{
+        type:Sequelize.INTEGER
+      },
+      GameId: {
+        type: Sequelize.INTEGER,
+        references:{
+          model:'games',
+          key:'id'
+        }
+      },
       GameUserId: {
         type: Sequelize.INTEGER,
         references:{
-          model:'GameUser',
+          model:'gameusers',
           key:'id'
         }
       },
       CardId: {
         type: Sequelize.INTEGER,
         references:{
-          model:'Card',
+          model:'cards',
           key:'id'
         }
       },

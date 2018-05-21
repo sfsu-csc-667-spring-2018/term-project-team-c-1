@@ -8,8 +8,22 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      name: {
-        type: Sequelize.STRING
+      status: {
+        type: Sequelize.INTEGER
+      },
+      GameId: {
+        type: Sequelize.INTEGER,
+        references:{
+          model:'games',
+          key:'id'
+        }
+      },
+      CardId: {
+        type: Sequelize.INTEGER,
+        references:{
+          model:'cards',
+          key:'id'
+        }
       },
       createdAt: {
         allowNull: false,

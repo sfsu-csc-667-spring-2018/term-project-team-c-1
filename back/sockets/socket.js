@@ -68,15 +68,24 @@ io.on("connection",socket=>{
                                 CardId:card.id,
                                 GameUserId:gameuser.id
                             }).then(play=>{
-                                if(card.type==2){
-                                    nextplay(socket,'skip');
-                                }
-                                else if(card.type==3){
-                                    nextplay(socket,'reverse');
-                                }
-                                else{
-                                    nextplay(socket,'normal');
-                                }
+                                models.UserCard.findAll({where:{GameUserId:gameuser.id}}).then(usercards=>{
+                                    if(usercards.length>0){
+                                        if(card.type==2){
+                                            nextplay(socket,'skip');
+                                        }
+                                        else if(card.type==3){
+                                            nextplay(socket,'reverse');
+                                        }
+                                        else{
+                                            nextplay(socket,'normal');
+                                        }
+                                    }
+                                    else{
+                                        models.Game.update({status:10},{where:{id:socket._gameId}}).then(g=>{
+                                            emitstate(socket._gameId);
+                                        })
+                                    }
+                                })
                             })
                         }
                         else{
@@ -86,15 +95,24 @@ io.on("connection",socket=>{
                                 CardId:card.id,
                                 GameUserId:gameuser.id
                             }).then(play=>{
-                                if(card.type==2){
-                                    nextplay(socket,'skip');
-                                }
-                                else if(card.type==3){
-                                    nextplay(socket,'reverse');
-                                }
-                                else{
-                                    nextplay(socket,'normal');
-                                }
+                                models.UserCard.findAll({where:{GameUserId:gameuser.id}}).then(usercards=>{
+                                    if(usercards.length>0){
+                                        if(card.type==2){
+                                            nextplay(socket,'skip');
+                                        }
+                                        else if(card.type==3){
+                                            nextplay(socket,'reverse');
+                                        }
+                                        else{
+                                            nextplay(socket,'normal');
+                                        }
+                                    }
+                                    else{
+                                        models.Game.update({status:10},{where:{id:socket._gameId}}).then(g=>{
+                                            emitstate(socket._gameId);
+                                        })
+                                    }
+                                })
                             })
                         }
                     });
@@ -228,7 +246,7 @@ io.on("connection",socket=>{
 
     socket.on('create',data=>{
         models.Game.find({
-            where:{status:{$ne:0}},
+            where:{$or:[{status:{$ne:0}},{status:{$ne:10}}]},
             UserId:socket._userId
         }).then(games=>{
             if(games){
