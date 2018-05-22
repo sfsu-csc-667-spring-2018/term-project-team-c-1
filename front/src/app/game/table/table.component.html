@@ -5,7 +5,7 @@
       </span>
       <span class="navbar-text float-xs-right" style="margin-right:5px;" *ngIf="game.UserId==userId">
         <button class="btn btn-danger" (click)="cancel()">Cancel</button>
-        <button class="btn btn-info" [disabled]="game.GameUsers.length==4" (click)="start()">Start</button>
+        <button class="btn btn-info" [disabled]="game.GameUsers.length<2" (click)="start()">Start</button>
       </span>
     </nav>
     <div class="container-fluid" *ngIf="game.status==1">
