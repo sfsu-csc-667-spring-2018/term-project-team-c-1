@@ -1,0 +1,111 @@
+.chat{
+    display: flex;
+    flex-flow: column;
+    width: 280px;
+    height: 300px;
+    position: fixed;
+    bottom: 0px;
+    right: 5px;
+}
+.chat_header{
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+    color: #e5e5e5;
+}
+.chat_box{
+    border: 1px solid #bababa;
+    width: 100%;
+    padding: 0px;
+    flex: 1;
+    display: flex;
+    flex-flow: column;
+}
+.chat_area{
+    flex: 1;
+    padding: 0px;
+    background: #f5f5f5;
+}
+.chat_message{
+    width: 100%;
+    padding: 0px;
+    height: 30px;
+    border-top: 1px solid #e5e5e5;
+}
+.chat_input{
+    border: 0px;
+    outline: none;
+    padding: 0px 5px;
+    height: 30px;
+    width: 232px;
+}
+.chat_send{
+    line-height: 30px;
+    border-left: 1px solid #bababa;
+    background: #b5b5b5;
+    float: right;
+    padding:0px 7px;
+    font-size: 14px;
+}
+div.chat-messages{
+    height: 221px;
+    padding: 0;
+    overflow-y: scroll;
+    background: #ffffff;
+}
+div.chat-messages > div.message-wrapper{
+    padding: 0px;
+    margin: 0px;
+    max-width: 100%;
+}
+div.chat-messages > div.message-wrapper > div.alert{
+    padding: 5px;
+    margin: 5px;
+    max-width: 80%;
+    display: inline-block;
+}
+div.chat-messages > div.message-wrapper.left{
+    text-align: left;
+}
+div.chat-messages > div.message-wrapper.right{
+    text-align: right;
+}
+div.chat-messages > div.message-wrapper.center{
+    text-align: center !important;
+    font-style: italic;
+}
+.board{
+    border:5px solid #5a5a5a;
+    background:#bababa;
+    width: 400px;
+    height: 400px;
+    position: absolute;
+    margin: auto;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+}
+.card{
+    width:60px;
+    height:92px;
+    background:url('../../../assets/uno.png');
+    background-size: 1014%;
+
+}
+.player{
+    position: absolute;
+    top: 400px;
+    width: 400px;
+    height: 100px;
+}
+.player1{
+    top:0px;
+    left:-400px;
+}
+.player2{
+    top:-300px;
+}
+.player3{
+    top:0px;
+    left:400px;
+}

@@ -1,0 +1,98 @@
+<div class="full-screen" style="display: flex;flex-flow: column;" *ngIf="game">
+    <nav class="navbar" *ngIf="game.status==1">
+      <span class="navbar-brand">
+        Host : {{game.User.username}}
+      </span>
+      <span class="navbar-text float-xs-right" style="margin-right:5px;" *ngIf="game.UserId==userId">
+        <button class="btn btn-danger" (click)="cancel()">Cancel</button>
+        <button class="btn btn-info" [disabled]="game.GameUsers.length<2" (click)="start()">Start</button>
+      </span>
+    </nav>
+    <div class="container-fluid" *ngIf="game.status==1">
+      <table class="table">
+        <thead class="thead-dark">
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Player</th>
+            <th scope="col">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of game.GameUsers;let i=index;">
+            <th scope="row">{{i+1}}</th>
+            <td>{{user.User.username}}</td>
+            <td *ngIf="user.User.id!=game.UserId && game.UserId==userId"><button (click)="remove(user.User.id)" class="btn btn-danger btn-xs">Remove</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="container-fluid" *ngIf="game.status==2">
+      <div class="board" *ngIf="gamestate">
+        <div class="card" style="position: absolute;margin:auto;left: 0;right: 0;top: 0;bottom: 0;" [ngStyle]="{'background-position-x.px':gamestate.GameCards[0].Card.xCoord,'background-position-y.px':gamestate.GameCards[0].Card.yCoord}"></div>
+        <div class="player">
+          <div class="container-fluid" style="text-align:center;">
+            {{gamestate.Users[0].User.username}}
+            <button *ngIf="gamestate.Users[0].isCurrent==true" class="btn btn-info btn-xs" (click)="draw()">Draw</button>
+            <div *ngIf="showColor">
+              <button class="btn btn-xs" (click)="addColor(1)">Red</button>
+              <button class="btn btn-xs" (click)="addColor(2)">Blue</button>
+              <button class="btn btn-xs" (click)="addColor(3)">Green</button>
+              <button class="btn btn-xs" (click)="addColor(4)">Yellow</button>
+            </div>
+          </div>
+          <div class="container-fluid">
+              <div style="float:left;"(click)="play(card)" *ngFor="let card of gamestate.Users[0].UserCards" class="card" [ngStyle]="{'background-position-x.px':card.Card.xCoord,'background-position-y.px':card.Card.yCoord}"></div>
+          </div>
+        </div>
+        <div *ngIf="gamestate.Users.length>=2" class="player player1">
+            <div class="container-fluid" style="text-align:center;">
+                {{gamestate.Users[1].User.username}}
+              </div>
+              <div class="container-fluid">
+                  <div style="float:left;" *ngFor="let card of gamestate.Users[1].UserCards" class="card" [ngStyle]="{'background-position-x.px':'646','background-position-y.px':'90'}"></div>
+              </div>
+        </div>
+        <div *ngIf="gamestate.Users.length>=3" class="player player2">
+            <div class="container-fluid" style="text-align:center;">
+                {{gamestate.Users[2].User.username}}
+              </div>
+              <div class="container-fluid">
+                  <div style="float:left;" *ngFor="let card of gamestate.Users[2].UserCards" class="card" [ngStyle]="{'background-position-x.px':'646','background-position-y.px':'90'}"></div>
+              </div>
+        </div>
+        <div *ngIf="gamestate.Users.length==4" class="player player3">
+            <div class="container-fluid" style="text-align:center;">
+                {{gamestate.Users[3].User.username}}
+              </div>
+              <div class="container-fluid">
+                  <div style="float:left;" *ngFor="let card of gamestate.Users[3].UserCards" class="card" [ngStyle]="{'background-position-x.px':'646','background-position-y.px':'90'}"></div>
+              </div>
+        </div>
+      </div>
+    </div>
+</div>
+<div class="chat">
+    <nav class="navbar navbar-inverse bg-dark chat_header">
+        <span class="nav-brand">
+          Chat Room
+        </span>
+    </nav>
+    <div class="container-fluid chat_box">
+        <div ngx-auto-scroll lock-y-offset="10" observe-attributes class="chat-messages">
+          <div class="message-wrapper" *ngFor="let msg of chatMessages;let i=index" [ngClass]="{'right':msg.GameUser.UserId==userId,'left':msg.GameUser.UserId!=userId}" role="alert"
+  >
+              <div class="alert" [ngClass]="{'alert-info': msg.GameUser.UserId == userId, 'alert-warning': msg.GameUser.UserId != userId}">
+                {{msg.GameUser.User.username}} : {{msg.message}}
+              </div>
+          </div>
+        </div>
+        <div class="container-fluid chat_message">
+          <form (ngSubmit)="sendMessage()" ngNativeValidate>
+            <div class="input-group">
+              <input type="text" class="form-control" style="outline:none;" placeholder="Message..." [ngModelOptions]="{standalone: true}"  [(ngModel)]="chatMessage" required>
+              <button type="submit" class="btn btn-success input-group-addon">Send</button>
+            </div>
+          </form>
+        </div>
+    </div>
+  </div>

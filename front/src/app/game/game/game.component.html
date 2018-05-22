@@ -1,0 +1,11 @@
+<div class="full-screen" style="display: flex;flex-flow: column;">
+	<nav class="navbar navbar-dark bg-dark">
+		<a routerLink="/game" class="navbar-brand">
+			<img src="assets/logo.png" width="30" height="30" class="d-inline-block align-top" alt="">
+		</a>
+		<span class="navbar-text float-xs-right" style="margin-right:5px;">
+			Welcome {{user.name}}
+		</span>
+	</nav>
+	<router-outlet></router-outlet>
+</div>
