@@ -245,6 +245,8 @@ io.on("connection",socket=>{
     });
 
     socket.on('create',data=>{
+        console.log(123);
+        
         models.Game.find({
             where:{$or:[{status:{$ne:0}},{status:{$ne:10}}],
             UserId:socket._userId}
